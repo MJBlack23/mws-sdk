@@ -1,0 +1,1 @@
+exports.Products = require('./products/');

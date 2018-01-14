@@ -1,0 +1,17 @@
+# env
+.env
+
+# node_modules
+node_modules/
+
+# text files
+.txt
+
+# processes (only for dev)
+processes/
+
+# devScripts
+app/devScripts/
+
+# test helper files
+test/helpers/
