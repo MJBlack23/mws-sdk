@@ -33,6 +33,7 @@ class Products extends MWS {
 
     let response = await this.makeCall(request);
     return parsers.getCompetitivePricing(response);
+    // return response;
   }
 
 

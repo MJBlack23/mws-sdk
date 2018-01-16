@@ -14,16 +14,18 @@ module.exports = async xml => {
       let json = {};
 
       let { Product: { Identifiers, CompetitivePricing, SalesRankings } } = result;
-
+      
       // assign SellerSKU
+      json.ASIN = Identifiers.MarketplaceASIN.ASIN;
       json.SellerSKU = Identifiers.SKUIdentifier.SellerSKU;
 
       // parse out OwnBuyBox and BuyBoxPrice
-      let buyBoxes = convert_to_array(CompetitivePricing.CompetitivePrices);
+      let buyBoxes = convert_to_array(CompetitivePricing.CompetitivePrices.CompetitivePrice);
+      
       buyBoxes.forEach(bb => {
-        if (bb.CompetitivePrice['$'].condition === 'New') {
-          let price = bb.CompetitivePrice.Price.LandedPrice.Amount;
-          let ownBB = bb.CompetitivePrice['$'].belongsToRequester;
+        if (bb['$'].condition === 'New') {
+          let price = bb.Price.LandedPrice.Amount;
+          let ownBB = bb['$'].belongsToRequester;
           json.BuyBoxPrice = (price) ? parseFloat(price) : null;
           json.OwnBuyBox = (ownBB === 'true') ? true : false;
         }
