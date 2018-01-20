@@ -4,14 +4,11 @@
 # node_modules
 node_modules/
 
-# text files
-.txt
-
-# processes (only for dev)
-processes/
-
 # devScripts
-app/devScripts/
+devScripts/
 
 # test helper files
-test/helpers/
+test/
+
+# docs
+out/

@@ -1,32 +1,52 @@
 'use strict';
 
-const assert = require('assert');
-const request = require('request-promise-native');
+const { promisify } = require('util');
 const crypto = require('crypto');
+const request = require('request-promise-native');
 const qs = require('querystring');
 const _ = require('lodash');
 
-class MWS {
-  constructor(config={}) {
-    if (!config.marketplaceId) throw Error('If using a configuration object, you must include marketplaceId');
-    if (!config.sellerId) throw Error('If using a configuration object, you must include sellerId');
-    if (!config.authToken) throw Error('If using a configuration object, you must include authToken');
-    if (!config.accessKeyId) throw Error('If using a configuration object, you must include accessKeyId');
-    if (!config.secretKey) throw Error('If using a configuration object, you must include secretKey');
+/** Promisify callbacks */
+const parseString = promisify(require('xml2js').parseString);
 
-    this.host = config.mwsHost || 'mws.amazonservices.com';
-    this.sellerId = config.sellerId;
-    this.authToken = config.authToken;
-    this.accessKeyId = config.accessKeyId;
-    this.secretKey = config.secretKey;
-    this.marketplaceId = config.marketplaceId;
+/** Base level representation of an Amazon Merchant Web Service Call */
+class MWS {
+  /**
+   * 
+   * @param {object} config - object containing the following
+   * @example marketplaceId - default used when not specifically needed by a call
+   * @example sellerId - seller id for your store
+   * @example authToken - MWS authentication token
+   * @example accessKeyId - MWS access key
+   * @example secretKey - MWS secret key
+   */
+  constructor(config=undefined) { 
+    /** Bind Context */
+    this.makeCall = this.makeCall.bind(this);
 
     MWS.__format_query = MWS.__format_query.bind(this);
+    MWS.__parse_env = MWS.__parse_env.bind(this);
+    MWS.__parse_config = MWS.__parse_config.bind(this);
+    MWS.__xml_to_json = MWS.__xml_to_json.bind(this);
+
+    if (!config) {
+      MWS.__parse_env()
+    } else {
+      MWS.__parse_config(config);
+    }
+
+    this.xml_options = { ignoreAttrs: false, explicitRoot: false, explicitArray: false };
   }
 
+
+  /**
+   * Formats params from a specific call into the basic format
+   * all calls use
+   * @param {object} params - json object of parameters passed from 
+   * down the inheritance chain on a specific call
+   */
   async makeCall(params) {
 
-    // append the query to the call object
     const call = {
       url: `https://${this.host}:443/${params.path}/${params.version}`,
       method: params.method,
@@ -41,7 +61,7 @@ class MWS {
 
     const query = MWS.__format_query(params);
 
-    // create the string to sign
+    /** Create the string to sign */
     const stringToSign = [
       params.method, 
       this.host, 
@@ -49,6 +69,7 @@ class MWS {
       qs.stringify(query)
     ].join('\n');
 
+    /** Sign the query */
     query.Signature = crypto
       .createHmac('sha256', this.secretKey)
       .update(stringToSign)
@@ -56,13 +77,14 @@ class MWS {
 
     call.qs = query;
 
-    // console.log(call);
-    // process.exit();
-
     return await request(call);
   }
 
 
+  /**
+   * Formats a query, converts to array, then sorts and returns the array
+   * @param {object} params - parameters from a call on a specific API
+   */
   static __format_query(params) {
     const BASE_QUERY = {
       SignatureVersion: 2,
@@ -75,12 +97,16 @@ class MWS {
       MarketplaceId: this.marketplaceId
     };
 
-    // append any params from the query
+    /** Append parameters to the query */
     _.keys(params.query).forEach(key => {
-      BASE_QUERY[key] = params.query[key];
+      if (key.indexOf('MarketplaceId') >= 0) 
+        delete BASE_QUERY.MarketplaceId;
+
+      if (params.query[key] !== null)
+        BASE_QUERY[key] = params.query[key];
     });
 
-    // sort the base Query
+    /** Sort the query */
     const keys = _.keys(BASE_QUERY);
     const sortedQuery = {};
     keys.sort();
@@ -91,6 +117,17 @@ class MWS {
     return sortedQuery;
   }
 
+
+  /**
+   * Allows the user to provide ENV variables instead of a configuration object
+   * Requires access to the following Environment variables
+   * @example MWS_HOST (not required, defaults to mws.amazonservices.com)
+   * @example MWS_MARKETPLACE_ID 
+   * @example MWS_SELLER_ID
+   * @example MWS_AUTH_TOKEN
+   * @example MWS_ACCESS_KEY
+   * @example MWS_SECRET_KEY
+   */
   static __parse_env() {
     const { MWS_HOST, MWS_MARKETPLACE_ID, MWS_SELLER_ID, MWS_AUTH_TOKEN, MWS_ACCESS_KEY, MWS_SECRET_KEY } = process.env;
 
@@ -108,6 +145,30 @@ class MWS {
     this.marketplaceId = MWS_MARKETPLACE_ID;
 
     return true;
+  }
+
+  
+  static __parse_config(config) {
+    if (!config.marketplaceId) throw Error('If using a configuration object, you must include marketplaceId');
+    if (!config.sellerId) throw Error('If using a configuration object, you must include sellerId');
+    if (!config.authToken) throw Error('If using a configuration object, you must include authToken');
+    if (!config.accessKeyId) throw Error('If using a configuration object, you must include accessKeyId');
+    if (!config.secretKey) throw Error('If using a configuration object, you must include secretKey');
+    
+    this.host = config.mwsHost || 'mws.amazonservices.com';
+    this.sellerId = config.sellerId;
+    this.authToken = config.authToken;
+    this.accessKeyId = config.accessKeyId;
+    this.secretKey = config.secretKey;
+    this.marketplaceId = config.marketplaceId;
+
+    return true;
+  }
+
+
+  static async __xml_to_json(xml, opts=null) {
+    opts = opts ? opts : this.xml_options;
+    return await parseString(xml, opts)
   }
 }; // end MWS Class
 
