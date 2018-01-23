@@ -71,7 +71,7 @@ class Orders extends MWS {
     
     /** Assign params to query */
     _.keys(params).forEach(key => {
-      if (typeof params[key] === 'string') {
+      if (typeof params[key] === 'string' || typeof params[key] === 'number') {
         request.query[key] = params[key]
       }
     });

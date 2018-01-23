@@ -1,5 +1,5 @@
 {
-  "name": "mws-sdk",
+  "name": "mws-sdk-async",
   "version": "0.0.1",
   "description": "A simple class based approach to work with Amazon's Merchant Web Services APIs.",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "test": "mocha -w --recursive"
   },
   "keywords": ["mws", "mws-sdk", "amazon web services"],
-  "author": "Matt Black",
+  "author": "Matt Black <mjblack23@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.4",
