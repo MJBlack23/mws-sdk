@@ -6,9 +6,12 @@ module.exports = async request => {
   let json = {};
 
   try {
-    const { ListOrdersResult: { Orders } } = request;
+    const { ListOrdersResult: { Orders, NextToken } } = request;
 
-    json = convertToArray(Orders.Order);
+    json = {
+      NextToken,
+      Orders: convertToArray(Orders.Order)
+    };
   } catch (e) {
     console.log(e);
   } finally {
