@@ -13,6 +13,10 @@ class Orders extends MWS {
       version: '2013-09-01',
       query: {}
     };
+
+    /** Bind Context */
+    this.listOrders = this.listOrders.bind(this);
+    this.listOrderItems = this.listOrderItems.bind(this);
   }
 
   /**
