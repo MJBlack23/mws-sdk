@@ -50,7 +50,7 @@ Base documentation http://docs.developer.amazonservices.com/en_US/orders-2013-09
 
 Throttling:  Max request quota: 6, restore rate: 1 request per minute
 ```javascript
-  let orders = await mws.ListOrders({
+  let orders = await mws.listOrders({
     CreatedAfter, // optional (see note below), ISO formatted date
     CreatedBefore, // optional (see note below), ISO formatted date
     LastUpdatedAfter, // optional (see note below), ISO formatted date
@@ -135,12 +135,22 @@ Response
 }
 ```
 
-### List Order Items
-
-Throttling: 
+### List Orders By Next Token
+Throttling:  Max request quota: 6, restore rate: 1 request per minute -- Shared with ListOrders
 
 ```javascript
-let items = await mws.orderItems(AmazonOrderId);
+let orders = await mws.listOrdersByNextToken(NextToken);
+```
+
+Response:  Same as ListOrders
+
+
+### List Order Items
+
+Throttling: Max request quote: 30, restore rate: 2 requests per second
+
+```javascript
+let items = await mws.listOrderItems(AmazonOrderId);
 ```
 
 Response

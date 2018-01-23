@@ -86,11 +86,21 @@ class Orders extends MWS {
   }
 
 
+  async listOrdersByNextToken (token) {
+    const request = Object.assign({}, this.BASE_REQUEST);
+    request.query.Action = 'ListOrdersByNextToken';
+    request.query.NextToken = token;
+
+    let response = await this.makeCall(request);
+    response = await Orders.__xml_to_json(response);
+    return parsers.listOrders(response);
+  }
+
+
   async listOrderItems(AmazonOrderId) {
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'ListOrderItems';
     request.query.AmazonOrderId = AmazonOrderId;
-    // request.query.MarketplaceId = null;
 
     let response = await this.makeCall(request);
     response = await Orders.__xml_to_json(response);
