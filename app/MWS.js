@@ -119,6 +119,15 @@ class MWS {
   }
 
 
+  static __detect_throttle (response) {
+    if (response.Error && response.Error.Code === 'RequestThrottled') {
+      throw new Error('Request Is Throttled');
+    }
+
+    return true;
+  }
+
+
   /**
    * Allows the user to provide ENV variables instead of a configuration object
    * Requires access to the following Environment variables

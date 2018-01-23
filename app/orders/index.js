@@ -80,8 +80,16 @@ class Orders extends MWS {
       }
     });
 
+    /** Make the Call */
     let response = await this.makeCall(request);
+
+    /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
+
+    /** Attempt to detect a throttled request */
+    Orders.__detect_throttle(response);
+    
+    /** Return the parsed response */
     return parsers.listOrders(response);
   }
 
@@ -91,8 +99,16 @@ class Orders extends MWS {
     request.query.Action = 'ListOrdersByNextToken';
     request.query.NextToken = token;
 
+    /** Make the Call */
     let response = await this.makeCall(request);
+
+    /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
+
+    /** Attempt to detect a throttled request */
+    Orders.__detect_throttle(response);
+
+    /** Return the parsed response */
     return parsers.listOrders(response);
   }
 
@@ -102,8 +118,16 @@ class Orders extends MWS {
     request.query.Action = 'ListOrderItems';
     request.query.AmazonOrderId = AmazonOrderId;
 
+    /** Make the Call */
     let response = await this.makeCall(request);
+
+    /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
+
+    /** Attempt to detect a throttled request */
+    Orders.__detect_throttle(response);
+
+    /** Return the parsed response */
     return parsers.listOrderItems(response);
   }
 

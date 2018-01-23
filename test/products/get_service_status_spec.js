@@ -1,11 +1,11 @@
 const { expect } = require('chai');
 const fs = require('fs');
-const parsers = require('../../app/products/parsers/');
+// const parsers = require('../../app/products/parsers/');
 
 // helpers
 let xml = fs.readFileSync('./test/helpers/GetServiceStatus.xml', 'utf8');
 
-describe('Testing the getServiceStatus call in the Products API', () => {
+describe.skip('Testing the getServiceStatus call in the Products API', () => {
 
   it('Should be able to parse the XML response', async () => {
     let json = await parsers.getServiceStatus(xml);
