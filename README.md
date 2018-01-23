@@ -84,94 +84,55 @@ Throttling:  Max request quota: 6, restore rate: 1 request per minute
 
 Response
 ```javascript
-[
-  {
-    LatestShipDate,
-    OrderType,
-    PurchaseDate,
-    AmazonOrderId,
-    BuyerEmail,
-    IsReplacementOrder,
-    LastUpdateDate,
-    NumberOfItemsShipped,
-    ShipServiceLevel,
-    OrderStatus,
-    SalesChannel,
-    ShippedByAmazonTFM,
-    IsBusinessOrder,
-    LatestDeliveryDate,
-    NumberOfItemsUnshipped,
-    PaymentMethodDetails: { PaymentMethodDetail }
-    BuyerName,
-    EarliestDeliveryDate,
-    OrderTotal: {
-      CurrencyCode,
-      Amount
+{
+  NextToken,
+  Orders: [
+    {
+      LatestShipDate,
+      OrderType,
+      PurchaseDate,
+      AmazonOrderId,
+      BuyerEmail,
+      IsReplacementOrder,
+      LastUpdateDate,
+      NumberOfItemsShipped,
+      ShipServiceLevel,
+      OrderStatus,
+      SalesChannel,
+      ShippedByAmazonTFM,
+      IsBusinessOrder,
+      LatestDeliveryDate,
+      NumberOfItemsUnshipped,
+      PaymentMethodDetails: { PaymentMethodDetail }
+      BuyerName,
+      EarliestDeliveryDate,
+      OrderTotal: {
+        CurrencyCode,
+        Amount
+      },
+      IsPremiumOrder,
+      EarliestShipDate,
+      MarketplaceId,
+      FulfillmentChannel,
+      PaymentMethod,
+      ShippingAddress: {
+        City,
+        AddressType,
+        PostalCode,
+        StateOrRegion,
+        Phone,
+        CountryCode,
+        Name,
+        AddressLine1,
+        AddressLine2
+      },
+      IsPrime,
+      ShipmentServiceLevelCategory,
+      SellerOrderId
     },
-    IsPremiumOrder,
-    EarliestShipDate,
-    MarketplaceId,
-    FulfillmentChannel,
-    PaymentMethod,
-    ShippingAddress: {
-      City,
-      AddressType,
-      PostalCode,
-      StateOrRegion,
-      Phone,
-      CountryCode,
-      Name,
-      AddressLine1,
-      AddressLine2
-    },
-    IsPrime,
-    ShipmentServiceLevelCategory,
-    SellerOrderId
-  }{
-    LatestShipDate,
-    OrderType,
-    PurchaseDate,
-    AmazonOrderId,
-    BuyerEmail,
-    IsReplacementOrder,
-    LastUpdateDate,
-    NumberOfItemsShipped,
-    ShipServiceLevel,
-    OrderStatus,
-    SalesChannel,
-    ShippedByAmazonTFM,
-    IsBusinessOrder,
-    LatestDeliveryDate,
-    NumberOfItemsUnshipped,
-    PaymentMethodDetails: { PaymentMethodDetail }
-    BuyerName,
-    EarliestDeliveryDate,
-    OrderTotal: {
-      CurrencyCode,
-      Amount
-    },
-    IsPremiumOrder,
-    EarliestShipDate,
-    MarketplaceId,
-    FulfillmentChannel,
-    PaymentMethod,
-    ShippingAddress: {
-      City,
-      AddressType,
-      PostalCode,
-      StateOrRegion,
-      Phone,
-      CountryCode,
-      Name,
-      AddressLine1,
-      AddressLine2
-    },
-    IsPrime,
-    ShipmentServiceLevelCategory,
-    SellerOrderId
-  },
-...
-]
+  ...
+  ]
+}
 ```
 
 ### List Order Items
