@@ -18,7 +18,12 @@ class Products extends MWS {
   async getServiceStatus () {
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'GetServiceStatus';
+
+    /** Make the Call */
     let response = await this.makeCall(request);
+
+    /** Convert the XML to JSON */
+    response = await Products.__xml_to_json(response);
 
     return parsers.getServiceStatus(response);
   } // end getServiceStatus
@@ -31,7 +36,12 @@ class Products extends MWS {
     request.query.Action = 'GetCompetitivePricingForSKU';
     Products.assignSKUListToQuery(request, list);
 
+    /** Make the Call */
     let response = await this.makeCall(request);
+
+    /** Convert the XML to JSON */
+    response = await Products.__xml_to_json(response);
+    
     return parsers.getCompetitivePricing(response);
   }
 

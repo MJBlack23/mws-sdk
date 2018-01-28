@@ -1,7 +1,7 @@
 'use strict';
 
-const xml_to_json = require('./_xml_to_json');
-const convert_to_array = require('./_convert_to_array');
+// const xml_to_json = require('./_xml_to_json');
+// const convert_to_array = require('./_convert_to_array');
 
 module.exports = async xml => {
   let response = {};

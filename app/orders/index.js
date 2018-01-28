@@ -85,9 +85,6 @@ class Orders extends MWS {
 
     /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
-
-    /** Attempt to detect a throttled request */
-    Orders.__detect_throttle(response);
     
     /** Return the parsed response */
     return parsers.listOrders(response);
@@ -105,9 +102,6 @@ class Orders extends MWS {
     /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
 
-    /** Attempt to detect a throttled request */
-    Orders.__detect_throttle(response);
-
     /** Return the parsed response */
     return parsers.listOrders(response);
   }
@@ -123,9 +117,6 @@ class Orders extends MWS {
 
     /** Convert the XML to JSON */
     response = await Orders.__xml_to_json(response);
-
-    /** Attempt to detect a throttled request */
-    Orders.__detect_throttle(response);
 
     /** Return the parsed response */
     return parsers.listOrderItems(response);

@@ -77,8 +77,13 @@ class MWS {
 
     call.qs = query;
 
-
-    return await request(call);
+    try {
+      return await request(call);
+    } catch (e) {
+      if (e.statusCode === 503) {
+        throw new Error('Warning!  Request Throttled');
+      }
+    }
   }
 
 
@@ -116,15 +121,6 @@ class MWS {
     });
 
     return sortedQuery;
-  }
-
-
-  static __detect_throttle (response) {
-    if (response.Error && response.Error.Code === 'RequestThrottled') {
-      throw new Error('Request Is Throttled');
-    }
-
-    return true;
   }
 
 
