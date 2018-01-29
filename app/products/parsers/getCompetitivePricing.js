@@ -15,7 +15,7 @@ module.exports = async json => {
 
       // TODO:  Parse out CompetitivePricing a little cleaner...
       let competition = [];
-      if (CompetitivePricing.CompetitivePrices !== "") {
+      if (CompetitivePricing.CompetitivePrices) {
         let comp = convertToArray(CompetitivePricing.CompetitivePrices.CompetitivePrice);
         competition = comp.map(compPrice => {
           let { Price: { LandedPrice, ListingPrice, Shipping } } = compPrice;
@@ -35,7 +35,8 @@ module.exports = async json => {
 
       let salesRanks= [];
       if (SalesRankings.SalesRank) {
-        salesRanks = SalesRankings.SalesRank.map(rank => {
+        let salesArrays = convertToArray(SalesRankings.SalesRank);
+        salesRanks = salesArrays.map(rank => {
           return {
             [rank.ProductCategoryId]: parseInt(rank.Rank, 10)
           }
