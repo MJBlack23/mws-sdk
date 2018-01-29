@@ -25,9 +25,18 @@ module.exports = async json => {
             Condition: compPrice['$'].condition,
             Subcondition: compPrice['$'].subcondition,
             BelongsToRequester: compPrice['$'].belongsToRequester === 'false' ? false : true,
-            LandedPrice,
-            ListingPrice,
-            Shipping
+            LandedPrice: {
+              CurrencyCode: LandedPrice.CurrencyCode,
+              Amount: parseFloat(LandedPrice.Amount)
+            },
+            ListingPrice: {
+              CurrencyCode: ListingPrice.CurrencyCode,
+              Amount: parseFloat(ListingPrice.Amount)
+            },
+            Shipping: {
+              CurrencyCode: Shipping.CurrencyCode,
+              Amount: parseFloat(Shipping.Amount)
+            }
           }
         });
       }
