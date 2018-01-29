@@ -12,6 +12,9 @@ class Products extends MWS {
       version: '2011-10-01',
       query: {}
     };
+
+    /** Bind Context */
+    this.getCompetitivePriceForSKUs = this.getCompetitivePriceForSKUs.bind(this);
   }
 
 
