@@ -19,12 +19,12 @@ module.exports = async json => {
         let comp = convertToArray(CompetitivePricing.CompetitivePrices.CompetitivePrice);
         competition = comp.map(compPrice => {
           let { Price: { LandedPrice, ListingPrice, Shipping } } = compPrice;
-
+          
           return {
             CompetitivePriceId: parseInt(compPrice.CompetitivePriceId),
             Condition: compPrice['$'].condition,
             Subcondition: compPrice['$'].subcondition,
-            BelongsToRequestor: compPrice['$'].belongsToRequestor,
+            BelongsToRequester: compPrice['$'].belongsToRequester === 'false' ? false : true,
             LandedPrice,
             ListingPrice,
             Shipping
