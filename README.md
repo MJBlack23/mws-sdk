@@ -202,3 +202,74 @@ Response
   ]
 }
 ```
+
+## Products API
+
+Base Products Documentation: https://developer.amazonservices.com/gp/mws/api.html/146-8039497-2146729?ie=UTF8&group=products&section=products&version=latest
+
+### Get Service Status
+
+Usage
+```javascript
+let response = await mws.getServiceStatus();
+```
+
+Response
+```javascript
+{
+  Status: 'GREEN', // or 'RED'
+  Timestamp
+}
+```
+ 
+### Get Competitive Price for SKU
+
+Usage
+
+getCompetitivePriceForSKUs accepts an array of Amazon Seller SKUs present within your amazon store. 
+
+** Note:  The sku list must contain at least 1 sku and can not contain more than 20 skus.
+
+```javascript
+let response = await MWS.getCompetitivePriceForSKUs([ 'sku1', 'sku2', ... ]);
+```
+
+```javascript
+[
+  {
+    SellerSKU,
+    Product: {
+      Identifiers: {
+        MarketplaceASIN: {
+          MarketplaceId,
+          ASIN
+        }
+        SKUIdentifier: {
+          MarketplaceId,
+          SellerId,
+          SellerSKU
+        }
+      },
+      CompetitivePricing: [
+        {
+          CompetitivePriceId,
+          Condition,
+          Subcondition,
+          LandedPrice: {
+            CurrencyCode,
+            Amount
+          },
+          ListingPrice: {
+            CurrencyCode,
+            Amount
+          },
+          Shipping: {
+            CurrencyCode,
+            Amount
+          }
+        }
+      ]
+    }
+  }
+]
+```

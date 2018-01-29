@@ -3,6 +3,10 @@
   "version": "0.1.1",
   "description": "A simple class based approach to work with Amazon's Merchant Web Services APIs.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MJBlack23/mws-sdk"
+  },
   "scripts": {
     "document": "jsdoc -r app/",
     "test": "mocha -w --recursive"
