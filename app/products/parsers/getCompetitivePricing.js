@@ -14,21 +14,24 @@ module.exports = async json => {
       let { Identifiers, CompetitivePricing, SalesRankings } = Product;
 
       // TODO:  Parse out CompetitivePricing a little cleaner...
-      let comp = convertToArray(CompetitivePricing.CompetitivePrices);
-      let competition = comp.map(compPrice => {
-        let { CompetitivePrice } = compPrice;
-        let { Price: { LandedPrice, ListingPrice, Shipping } } = CompetitivePrice;
+      let competition = [];
+      if (CompetitivePricing.CompetitivePrices !== "") {
+        let comp = convertToArray(CompetitivePricing.CompetitivePrices.CompetitivePrice);
+        competition = comp.map(compPrice => {
+          let { Price: { LandedPrice, ListingPrice, Shipping } } = compPrice;
 
-        return {
-          CompetitivePriceId: parseInt(CompetitivePrice.CompetitivePriceId),
-          Condition: CompetitivePrice['$'].condition,
-          Subcondition: CompetitivePrice['$'].subcondition,
-          BelongsToRequestor: CompetitivePrice['$'].belongsToRequestor,
-          LandedPrice,
-          ListingPrice,
-          Shipping
-        }
-      });
+          return {
+            CompetitivePriceId: parseInt(compPrice.CompetitivePriceId),
+            Condition: compPrice['$'].condition,
+            Subcondition: compPrice['$'].subcondition,
+            BelongsToRequestor: compPrice['$'].belongsToRequestor,
+            LandedPrice,
+            ListingPrice,
+            Shipping
+          }
+        });
+      }
+
 
       let salesRanks= [];
       if (SalesRankings.SalesRank) {
