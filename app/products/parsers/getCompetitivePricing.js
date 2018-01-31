@@ -10,10 +10,15 @@ module.exports = async json => {
     let result = convertToArray(GetCompetitivePricingForSKUResult);
     
     response = result.map(item => {
-      let { $: { SellerSKU }, Product } = item
+      let { $: { SellerSKU }, Product, Error } = item
+      if (Error) {
+        return {
+          SellerSKU,
+          Error
+        }
+      }
       let { Identifiers, CompetitivePricing, SalesRankings } = Product;
 
-      // TODO:  Parse out CompetitivePricing a little cleaner...
       let competition = [];
       if (CompetitivePricing.CompetitivePrices) {
         let comp = convertToArray(CompetitivePricing.CompetitivePrices.CompetitivePrice);
