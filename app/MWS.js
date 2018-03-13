@@ -25,14 +25,12 @@ class MWS {
     this.makeCall = this.makeCall.bind(this);
 
     MWS.__format_query = MWS.__format_query.bind(this);
-    MWS.__parse_env = MWS.__parse_env.bind(this);
-    MWS.__parse_config = MWS.__parse_config.bind(this);
     MWS.__xml_to_json = MWS.__xml_to_json.bind(this);
 
     if (!config) {
-      MWS.__parse_env()
+      this.parseEnv();
     } else {
-      MWS.__parse_config(config);
+      this.parseConfig(config);
     }
 
     this.xml_options = { ignoreAttrs: false, explicitRoot: false, explicitArray: false };
@@ -134,7 +132,7 @@ class MWS {
    * @example MWS_ACCESS_KEY
    * @example MWS_SECRET_KEY
    */
-  static __parse_env() {
+  parseEnv() {
     const { MWS_HOST, MWS_MARKETPLACE_ID, MWS_SELLER_ID, MWS_AUTH_TOKEN, MWS_ACCESS_KEY, MWS_SECRET_KEY } = process.env;
 
     if (!MWS_MARKETPLACE_ID) throw Error('If using environment variables, you must include MWS_MARKETPLACE_ID');
@@ -154,7 +152,7 @@ class MWS {
   }
 
   
-  static __parse_config(config) {
+  parseConfig(config) {
     if (!config.marketplaceId) throw Error('If using a configuration object, you must include marketplaceId');
     if (!config.sellerId) throw Error('If using a configuration object, you must include sellerId');
     if (!config.authToken) throw Error('If using a configuration object, you must include authToken');

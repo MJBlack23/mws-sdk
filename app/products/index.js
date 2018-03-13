@@ -1,5 +1,3 @@
-'use strict';
-
 const MWS = require('../MWS');
 const parsers = require('./parsers');
 
@@ -10,7 +8,7 @@ class Products extends MWS {
       method: 'GET',
       path: 'Products',
       version: '2011-10-01',
-      query: {}
+      query: {},
     };
 
     /** Bind Context */
