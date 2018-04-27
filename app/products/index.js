@@ -16,7 +16,7 @@ class Products extends MWS {
   }
 
 
-  async getServiceStatus () {
+  async getServiceStatus() {
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'GetServiceStatus';
 
@@ -24,13 +24,13 @@ class Products extends MWS {
     let response = await this.makeCall(request);
 
     /** Convert the XML to JSON */
-    response = await Products.__xml_to_json(response);
+    response = await Products.XMLToJSON(response);
 
     return parsers.getServiceStatus(response);
   } // end getServiceStatus
 
 
-  async getCompetitivePriceForSKUs(list=[]) {
+  async getCompetitivePriceForSKUs(list = []) {
     Products.validListLength(list, 'getCompetitivePriceForSKUs');
 
     const request = Object.assign({}, this.BASE_REQUEST);
@@ -41,13 +41,13 @@ class Products extends MWS {
     let response = await this.makeCall(request);
 
     /** Convert the XML to JSON */
-    response = await Products.__xml_to_json(response);
-    
+    response = await Products.XMLToJSON(response);
+
     return parsers.getCompetitivePricing(response);
   }
 
 
-  async getMyPriceForSKUs(list=[]) {
+  async getMyPriceForSKUs(list = []) {
     Products.validListLength(list, 'getMyPriceForSKU');
 
     const request = Object.assign({}, this.BASE_REQUEST);
@@ -55,57 +55,53 @@ class Products extends MWS {
 
     Products.assignSKUListToQuery(request, list);
 
-    let response = await this.makeCall(request);
-    
+    const response = await this.makeCall(request);
+
     return parsers.getMyPrice(response);
   }
 
 
   async getLowestPriceOffersForASIN(asin) {
-    if (typeof asin !== 'string' || asin.length !== 10)
-      throw Error(`This call requests a single 10 digit ASIN as a parameter.`);
+    if (typeof asin !== 'string' || asin.length !== 10) {
+      throw Error('This call requests a single 10 digit ASIN as a parameter.');
+    }
 
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'GetLowestPricedOffersForASIN';
     request.query.ItemCondition = 'New';
     request.query.ASIN = asin;
 
-    let response = await this.makeCall(request);
-
-    return response;
+    return this.makeCall(request);
   }
 
 
   async getLowestPriceOffersForSKU(sku) {
-
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'GetLowestPricedOffersForSKU';
     request.query.ItemCondition = 'New';
     request.query.SellerSKU = sku;
 
-    let response = await this.makeCall(request);
+    const response = await this.makeCall(request);
 
     return parsers.getLowestOffers(response);
     // return response;
   }
 
 
-  static validListLength (list, call) {
+  static validListLength(list, call) {
     if (list.length <= 0 || list.length > 20) {
       throw Error(`${call} requires an array of between 1 and 20 SKUs.`);
     }
     return true;
   }
 
-  static assignSKUListToQuery (request, list) {
+  static assignSKUListToQuery(request, list) {
     list.forEach((item, i) => {
       request.query[`SellerSKUList.SellerSKU.${i + 1}`] = item;
     });
 
     return request;
   }
-
-      
 }
 
 module.exports = Products;

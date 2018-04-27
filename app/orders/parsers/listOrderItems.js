@@ -1,21 +1,14 @@
-'use strict';
-
 const { convertToArray } = require('../../helpers/');
 
-module.exports = async request => {
-  let json = {};
-
+module.exports = (request) => {
   try {
     const { ListOrderItemsResult: { OrderItems, AmazonOrderId } } = request;
 
-    json = {
+    return {
       AmazonOrderId,
-      OrderItems: convertToArray(OrderItems.OrderItem)
-    }
+      OrderItems: convertToArray(OrderItems.OrderItem),
+    };
   } catch (e) {
-    console.log(e);
-  } finally {
-    return json;
+    throw e;
   }
-
-}
+};

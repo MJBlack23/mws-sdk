@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const MWS = require('../MWS');
 const parsers = require('./parsers');
@@ -11,7 +9,7 @@ class Orders extends MWS {
       method: 'POST',
       path: 'Orders',
       version: '2013-09-01',
-      query: {}
+      query: {},
     };
 
     /** Bind Context */
@@ -31,17 +29,18 @@ class Orders extends MWS {
    * @param {string} params.LastUpdatedBefore - optional ISO timestamp
    */
   async listOrders(params) {
-    const request = Object.assign({}, this.BASE_REQUEST);
+    const request = { ...this.BASE_REQUEST };
     request.query.Action = 'ListOrders';
 
     /** Assign Marketplace Id(s) */
     if (!params.MarketplaceId) {
-      request.query['MarketplaceId.Id.1'] = this.marketplaceId
+      request.query['MarketplaceId.Id.1'] = this.marketplaceId;
     } else if (typeof params.MarketplaceId !== 'object' || _.keys(params.MarketplaceId)[0] !== '0') {
       throw new Error('params.MarketplaceId must be an array');
     } else {
       params.MarketplaceId.forEach((marketPlace, id) => {
-        request.query[`MarketplaceId.Id.${++id}`] = marketPlace;
+        const num = id + 1;
+        request.query[`MarketplaceId.Id.${num}`] = marketPlace;
       });
 
       delete params.MarketplaceId;
@@ -53,7 +52,8 @@ class Orders extends MWS {
         throw new Error('params.OrderStatus must be an array');
       } else {
         params.OrderStatus.forEach((status, id) => {
-          request.query[`OrderStatus.Status.${++id}`] = status;
+          const num = id + 1;
+          request.query[`OrderStatus.Status.${num}`] = status;
         });
 
         delete params.OrderStatus;
@@ -66,17 +66,18 @@ class Orders extends MWS {
         throw new Error('params.FulfillmentChannel must be an array');
       } else {
         params.FulfillmentChannel.forEach((channel, id) => {
-          request.query[`FulfillmentChannel.Channel.${++id}`] = channel;
+          const num = id + 1;
+          request.query[`FulfillmentChannel.Channel.${num}`] = channel;
         });
 
         delete params.FulfillmentChannel;
       }
     }
-    
+
     /** Assign params to query */
-    _.keys(params).forEach(key => {
+    _.keys(params).forEach((key) => {
       if (typeof params[key] === 'string' || typeof params[key] === 'number') {
-        request.query[key] = params[key]
+        request.query[key] = params[key];
       }
     });
 
@@ -84,14 +85,14 @@ class Orders extends MWS {
     let response = await this.makeCall(request);
 
     /** Convert the XML to JSON */
-    response = await Orders.__xml_to_json(response);
-    
+    response = await Orders.XMLToJSON(response);
+
     /** Return the parsed response */
     return parsers.listOrders(response);
   }
 
 
-  async listOrdersByNextToken (token) {
+  async listOrdersByNextToken(token) {
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'ListOrdersByNextToken';
     request.query.NextToken = token;
@@ -100,7 +101,7 @@ class Orders extends MWS {
     let response = await this.makeCall(request);
 
     /** Convert the XML to JSON */
-    response = await Orders.__xml_to_json(response);
+    response = await Orders.XMLToJSON(response);
 
     /** Return the parsed response */
     return parsers.listOrders(response);
@@ -116,12 +117,11 @@ class Orders extends MWS {
     let response = await this.makeCall(request);
 
     /** Convert the XML to JSON */
-    response = await Orders.__xml_to_json(response);
+    response = await Orders.XMLToJSON(response);
 
     /** Return the parsed response */
     return parsers.listOrderItems(response);
   }
-
 }
 
 module.exports = Orders;

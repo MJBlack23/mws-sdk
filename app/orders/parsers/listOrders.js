@@ -1,12 +1,9 @@
-'use strict';
-
 const { convertToArray } = require('../../helpers/');
 
-module.exports = async request => {
-  let json = {};
-
+module.exports = (request) => {
   try {
-    let Orders, NextToken;
+    let Orders;
+    let NextToken;
     if (Object.keys(request).includes('ListOrdersResult')) {
       Orders = request.ListOrdersResult.Orders;
       NextToken = request.ListOrdersResult.NextToken;
@@ -15,14 +12,11 @@ module.exports = async request => {
       NextToken = request.ListOrdersByNextTokenResult.NextToken;
     }
 
-    json = {
+    return {
       Orders: convertToArray(Orders.Order),
-      NextToken: NextToken || null
+      NextToken: NextToken || null,
     };
   } catch (e) {
-    console.log(e);
-  } finally {
-    return json;
+    throw e;
   }
-
-}
+};
