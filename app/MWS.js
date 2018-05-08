@@ -48,12 +48,17 @@ class MWS {
       headers: {
         Host: this.host,
         'User-Agent': 'OMS/1.0 (language=Javascript)',
-        'Content-Type': 'text/xml',
+        'Content-Type': 'x-www-form-urlencoded',
+        // 'Content-Type': 'text/xml',
       },
       responseFormat: 'json',
       qs: null,
       resolveWithFullResponse,
     };
+
+    if (params.body) {
+      call.body = params.body;
+    }
 
     const query = MWS.formatQuery(params);
 
@@ -81,6 +86,16 @@ class MWS {
       }
       throw e;
     }
+  }
+
+  /**
+   * Calculate the MD5 hash of a string
+   *
+   * @param {String} string - The string (or buffer).
+   * @return {String}       - The MD5 Hash
+   */
+  static generateMD5(string) {
+    return crypto.createHash('md5').update(string).digest('base64');
   }
 
 
