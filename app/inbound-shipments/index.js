@@ -56,7 +56,7 @@ class InboundShipments extends MWS {
       } else if (typeof params.InboundShipmentPlanRequestItems !== 'object') {
         throw new Error('params.InboundShipmentPlanRequestItems must be an array');
       } else {
-        InboundShipments.assignItems(request, params.InboundShipmentPlanRequestItems);
+        InboundShipments.assignItems(request, params.InboundShipmentPlanRequestItems, 'InboundShipmentPlanRequestItems');
       }
 
       /** Make the Call */
@@ -80,7 +80,7 @@ class InboundShipments extends MWS {
    * @param {string} params.SellerId - seller id on amazon marketplace
    * @param {string} params.LabelPrepPreference - prep preference for inbound shipments
    * @param {object} params.ShipFromAddress - object that contains the ship from name, address, city, state, postal code, and country code
-   * @param {array}  params.InboundShipmentPlanRequestItems - array of objects that contain the items sellerSKU, quantity
+   * @param {array}  params.InboundShipmentPlanRequestItems - array of objects that contain the items' SellerSKU, QuantityShipped, QuantityInCase
    * @param {string} params.ShipmentId - the id for the shipment returned from the createInboundShipmentPlan call
    * @param {string} params.DestinationFulfillmentCenterId - the id returned from the createInboundShipmentPlan call
    * @param {string} params.ShipmentStatus - Status of the shipment.
@@ -112,6 +112,12 @@ class InboundShipments extends MWS {
         throw new Error('params.LabelPrepPreference must be an object');
       }
 
+      _.keys(params.InboundShipmentHeader).forEach((key) => {
+        if (key !== 'ShipFromAddress') {
+          request.query[`InboundShipmentHeader.${key}`] = params.InboundShipmentHeader[key];
+        }
+      });
+
       /** Assign the Ship From Address */
       if (!params.InboundShipmentHeader.ShipFromAddress) {
         throw new Error('InboundShipmentHeader.ShipFromAddress must be provided.');
@@ -125,37 +131,13 @@ class InboundShipments extends MWS {
         });
       }
 
-      if (!params.InboundShipmentHeader.ShipmentName) {
-        throw new Error('ShipmentName is required');
-      } else if (typeof params.InboundShipmentHeader.ShipmentName !== 'string') {
-        throw new Error('ShipmentName must be a string');
-      } else {
-        request.query['InboundShipmentHeader.ShipmentName'] = params.InboundShipmentHeader.ShipmentName;
-      }
-
-      if (!params.InboundShipmentHeader.DestinationFulfillmentCenterId) {
-        throw new Error('DestinationFulfillmentCenterId is required');
-      } else if (typeof params.InboundShipmentHeader.DestinationFulfillmentCenterId !== 'string') {
-        throw new Error('DetinationFulfillmentCenterId must be a string');
-      } else {
-        request.query['InboundShipmentHeader.DestinationFulfillmentCenterId'] = params.InboundShipmentHeader.DestinationFulfillmentCenterId;
-      }
-
-      if (!params.InboundShipmentHeader.LabelPrepPreference) {
-        throw new Error('LabelPrepPreference is required');
-      } else if (typeof params.InboundShipmentHeader.LabelPrepPreference !== 'string') {
-        throw new Error('LabelPrepPreference must be a string');
-      } else {
-        request.query['InboundShipmentHeader.LabelPrepPreference'] = params.InboundShipmentHeader.LabelPrepPreference;
-      }
-
       /** Assign the Inbound Shipment Plan Items */
-      if (!params.InboundShipmentPlanRequestItems) {
-        throw new Error('params.InboundShipmentPlanRequestItems must be provided.');
-      } else if (typeof params.InboundShipmentPlanRequestItems !== 'object') {
-        throw new Error('params.InboundShipmentPlanRequestItems must be an array');
+      if (!params.InboundShipmentItems) {
+        throw new Error('params.InboundShipmentItems must be provided.');
+      } else if (typeof params.InboundShipmentItems !== 'object') {
+        throw new Error('params.InboundShipmentItems must be an array');
       } else {
-        InboundShipments.assignItems(request, params.InboundShipmentPlanRequestItems);
+        InboundShipments.assignItems(request, params.InboundShipmentItems, 'InboundShipmentItems');
       }
 
       /** Make the Call */
@@ -202,12 +184,17 @@ class InboundShipments extends MWS {
     return response;
   }
 
-  static assignItems(request, items) {
+  static assignItems(request, items, itemType) {
     let itemNumber;
     items.forEach((item, i) => {
       itemNumber = i + 1;
       _.keys(item).forEach((key) => {
-        request.query[`InboundShipmentPlanRequestItems.member.${itemNumber}.${key}`] = item[key];
+        if (key !== 'PrepDetailsList') {
+          request.query[`${itemType}.member.${itemNumber}.${key}`] = item[key];
+        } else {
+          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${itemNumber}.PrepInstruction`] = item[key].PrepInstruction;
+          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${itemNumber}.PrepOwner`] = item[key].PrepOwner;
+        }
       });
     });
 
