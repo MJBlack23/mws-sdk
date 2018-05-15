@@ -16,7 +16,7 @@ class InboundShipments extends MWS {
    * @param {string} params.SellerId - seller id on amazon marketplace
    * @param {string} params.LabelPrepPreference - prep preference for inbound shipments
    * @param {object} params.ShipFromAddress - object that contains the ship from name, address, city, state, postal code, and country code
-   * @param {array} params.InboundShipmentPlanRequestItems - array of objects that contain the items sellerSKU, quantity, prep Instructions, and prep owner
+   * @param {array} params.InboundShipmentPlanRequestItems - array of objects that contain the items sellerSKU, quantity, case quantity prep Instructions, and prep owner
    */
   async createInboundShipmentPlan(params) {
     const request = { ...this.BASE_REQUEST };
@@ -42,12 +42,7 @@ class InboundShipments extends MWS {
       } else if (typeof params.ShipFromAddress !== 'object') {
         throw new Error('parms.ShipFromAddress must be an object.');
       } else {
-        _.keys(params.ShipFromAddress).forEach((key, i) => {
-          let itemNumber = i + 1;
-          if (typeof params.ShipFromAddress[key] === 'string') {
-            request.query[`ShipFromAddress.${key}`] = params.ShipFromAddress[key];
-          }
-        });
+        InboundShipments.assignAddress(request, params.ShipFromAddress, '');
       }
 
       /** Assign the Inbound Shipment Plan Items */
@@ -109,7 +104,7 @@ class InboundShipments extends MWS {
 
       /** Check the inbound shipment header type */
       if (params.InboundShipmentHeader && typeof params.InboundShipmentHeader !== 'object') {
-        throw new Error('params.LabelPrepPreference must be an object');
+        throw new Error('params.InboundShipmentHeader must be an object');
       }
 
       _.keys(params.InboundShipmentHeader).forEach((key) => {
@@ -124,11 +119,7 @@ class InboundShipments extends MWS {
       } else if (typeof params.InboundShipmentHeader.ShipFromAddress !== 'object') {
         throw new Error('InboundShipmentHeader.ShipFromAddress must be an object.');
       } else {
-        _.keys(params.InboundShipmentHeader.ShipFromAddress).forEach((key) => {
-          if (typeof params.InboundShipmentHeader.ShipFromAddress[key] === 'string') {
-            request.query[`InboundShipmentHeader.ShipFromAddress.${key}`] = params.InboundShipmentHeader.ShipFromAddress[key];
-          }
-        });
+        InboundShipments.assignAddress(request, params.InboundShipmentHeader.ShipFromAddress, 'InboundShipmentHeader');
       }
 
       /** Assign the Inbound Shipment Plan Items */
@@ -139,7 +130,7 @@ class InboundShipments extends MWS {
       } else {
         InboundShipments.assignItems(request, params.InboundShipmentItems, 'InboundShipmentItems');
       }
-
+      
       /** Make the Call */
       let response = await this.makeCall(request);
 
@@ -157,6 +148,11 @@ class InboundShipments extends MWS {
     }
   }
 
+  /**
+   * @param {array} params.ShipmentStatusList - array of Shipment statuses. Used to select shipments matching array values
+   * @param {array} params.ShipmentIdList - array of shipment Ids
+   * If both ShipmentStatusList and ShipmentIdList only shipments that match both are returned.
+   */
   async listInboundShipments(params) {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'ListInboundShipments';
@@ -168,7 +164,31 @@ class InboundShipments extends MWS {
       request.query['SellerId'] = params.SellerId;
     }
 
-    request.query['ShipmentStatusList.member.1'] = 'WORKING';
+    /** Check the Shipment Status List type */
+    if (params.ShipmentStatusList && typeof params.ShipmentStatusList !== 'object') {
+      throw new Error('params.ShipmentStatusList must be an array');
+    } else if (params.ShipmentStatusList) {
+      let statusNumber;
+      params.ShipmentStatusList.forEach((status, i) => {
+        statusNumber = i + 1;
+        if (typeof status === 'string') {
+          request.query[`ShipmentStatusList.member.${statusNumber}`] = status;
+        }
+      });
+    }
+
+    /** Check the Shipment Status List type */
+    if (params.ShipmentIdList && typeof params.ShipmentIdList !== 'object') {
+      throw new Error('params.ShipmentIdList must be an array');
+    } else if (params.ShipmentIdList) {
+      let idNumber;
+      params.ShipmentIdList.forEach((id, i) => {
+        idNumber = i + 1;
+        if (typeof id === 'string') {
+          request.query[`ShipmentIdList.member.${idNumber}`] = id;
+        }
+      });
+    }
 
     /** Make the Call */
     let response = await this.makeCall(request);
@@ -196,6 +216,20 @@ class InboundShipments extends MWS {
           request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${itemNumber}.PrepOwner`] = item[key].PrepOwner;
         }
       });
+    });
+
+    return request;
+  }
+
+  static assignAddress(request, address, type) {
+    _.keys(address).forEach((key) => {
+      if (typeof address[key] === 'string') {
+        if (type !== '') {
+          request.query[`${type}.ShipFromAddress.${key}`] = address[key];
+        } else {
+          request.query[`ShipFromAddress.${key}`] = address[key];
+        }
+      }
     });
 
     return request;
