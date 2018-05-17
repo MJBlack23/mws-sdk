@@ -154,7 +154,10 @@ class Feeds extends MWS {
       request.query.FeedSubmissionId = feedSubmissionId;
 
       /** Make the Call */
-      const { headers, body } = await this.makeCall(request, true);
+      // const { headers, body } = await this.makeCall(request, true);
+      const response = await this.makeCall(request, true);
+      console.log(response);
+      process.exit();
 
       /** Convert the XML to JSON */
       const json = await Feeds.XMLToJSON(body);
