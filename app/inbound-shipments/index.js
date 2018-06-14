@@ -5,7 +5,7 @@ class InboundShipments extends MWS {
   constructor(options) {
     super(options);
     this.BASE_REQUEST = {
-      method: 'POST',
+      method: 'GET',
       path: 'FulfillmentInboundShipment',
       version: '2010-10-01',
       query: {},
@@ -55,17 +55,17 @@ class InboundShipments extends MWS {
       }
 
       /** Make the Call */
-      let response = await this.makeCall(request);
+      const { headers, body } = await this.makeCall(request, true);
+      // const response = await this.makeCall(request, true);
 
-      /** Convert the XML to JSON */
-      response = await InboundShipments.XMLToJSON(response);
+      // /** Convert the XML to JSON */
+      const json = await InboundShipments.XMLToJSON(body);
 
-      if (response['$']) {
-        delete response['$'];
+      if (json.$) {
+        delete json.$;
       }
 
-      /** Return the parsed response */
-      return response;
+      return { headers, body: json };
     } catch (e) {
       console.log(e);
     }
@@ -85,11 +85,14 @@ class InboundShipments extends MWS {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'CreateInboundShipment';
 
+    request.query['InboundShipmentHeader.ShipmentStatus'] = 'WORKING';
+    request.query['InboundShipmentHeader.IntendedBoxContentsSource'] = 'FEED';
+
     /** Assign Seller ID */
     if (!params.SellerId) {
-      request.query['SellerId'] = this.sellerId;
+      request.query.SellerId = this.sellerId;
     } else {
-      request.query['SellerId'] = params.SellerId;
+      request.query.SellerId = params.SellerId;
     }
 
     try {
@@ -98,7 +101,7 @@ class InboundShipments extends MWS {
       } else if (typeof params.ShipmentId !== 'string') {
         throw new Error('ShipmentId must be a string');
       } else {
-        request.query['ShipmentId'] = params.ShipmentId;
+        request.query.ShipmentId = params.ShipmentId;
       }
 
 
@@ -132,17 +135,17 @@ class InboundShipments extends MWS {
       }
       
       /** Make the Call */
-      let response = await this.makeCall(request);
+      const { headers, body } = await this.makeCall(request, true);
 
       /** Convert the XML to JSON */
-      response = await InboundShipments.XMLToJSON(response);
+      const json = await InboundShipments.XMLToJSON(body);
 
-      if (response['$']) {
-        delete response['$'];
+      if (json.$) {
+        delete json.$;
       }
 
       /** Return the parsed response */
-      return response;
+      return { headers, body: json };
     } catch (e) {
       console.log(e);
     }
