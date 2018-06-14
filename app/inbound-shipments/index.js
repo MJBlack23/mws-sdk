@@ -212,8 +212,8 @@ class InboundShipments extends MWS {
         if (key !== 'PrepDetailsList') {
           request.query[`${itemType}.member.${itemNumber}.${key}`] = item[key];
         } else {
-          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${itemNumber}.PrepInstruction`] = item[key].PrepInstruction;
-          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${itemNumber}.PrepOwner`] = item[key].PrepOwner;
+          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.1.PrepInstruction`] = item[key].PrepInstruction;
+          request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.1.PrepOwner`] = item[key].PrepOwner;
         }
       });
     });
