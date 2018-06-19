@@ -76,7 +76,12 @@ class MWS {
       .update(stringToSign)
       .digest('base64');
 
-    call.qs = query;
+    /** If the method has a form option then add the query to the http body */
+    if (params.form) {
+      call.form = qs.stringify(query);
+    } else {
+      call.qs = query;
+    }
 
     try {
       return request(call);

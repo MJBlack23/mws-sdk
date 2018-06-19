@@ -5,7 +5,6 @@ class InboundShipments extends MWS {
   constructor(options) {
     super(options);
     this.BASE_REQUEST = {
-      method: 'GET',
       path: 'FulfillmentInboundShipment',
       version: '2010-10-01',
       query: {},
@@ -21,6 +20,10 @@ class InboundShipments extends MWS {
   async createInboundShipmentPlan(params) {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'CreateInboundShipmentPlan';
+    request.form = true;
+  
+    /** Set the method for the call */
+    request.method = 'POST';
 
     /** Assign Seller ID */
     if (!params.SellerId) {
@@ -84,6 +87,10 @@ class InboundShipments extends MWS {
   async createInboundShipment(params) {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'CreateInboundShipment';
+    request.form = true;
+
+    /** Set the method for the call */
+    request.method = 'POST';
 
     request.query['InboundShipmentHeader.ShipmentStatus'] = 'WORKING';
     request.query['InboundShipmentHeader.IntendedBoxContentsSource'] = 'FEED';
@@ -159,6 +166,9 @@ class InboundShipments extends MWS {
   async listInboundShipments(params) {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'ListInboundShipments';
+
+    /** Set the method for the call */
+    request.method = 'GET';
 
     /** Assign Seller ID */
     if (!params.SellerId) {
