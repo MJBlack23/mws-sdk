@@ -5,6 +5,7 @@ class InboundShipments extends MWS {
   constructor(options) {
     super(options);
     this.BASE_REQUEST = {
+      method: 'POST',
       path: 'FulfillmentInboundShipment',
       version: '2010-10-01',
       query: {},
@@ -21,9 +22,6 @@ class InboundShipments extends MWS {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'CreateInboundShipmentPlan';
     request.form = true;
-  
-    /** Set the method for the call */
-    request.method = 'POST';
 
     /** Assign Seller ID */
     if (!params.SellerId) {
@@ -88,9 +86,6 @@ class InboundShipments extends MWS {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'CreateInboundShipment';
     request.form = true;
-
-    /** Set the method for the call */
-    request.method = 'POST';
 
     request.query['InboundShipmentHeader.ShipmentStatus'] = 'WORKING';
     request.query['InboundShipmentHeader.IntendedBoxContentsSource'] = 'FEED';
@@ -215,6 +210,58 @@ class InboundShipments extends MWS {
 
     /** Return the parsed response */
     return response;
+  }
+
+  /**
+   * @param {string} params.SellerId - seller id on amazon marketplace
+   * @param {array}   params.SellerSKUList - List of SellerSKU values. Max of 50.
+   * @param {string}  params.ShipToCountryCode - The country code of the country the items will be shipped to.
+   */
+  async getPrepInstructionsForSKU(params) {
+    const request = { ...this.BASE_REQUEST };
+    request.query.Action = 'GetPrepInstructionsForSKU';
+    request.form = true;
+
+    /** Assign Seller ID */
+    if (!params.SellerId) {
+      request.query.SellerId = this.sellerId;
+    } else {
+      request.query.SellerId = params.SellerId;
+    }
+
+    try {
+      if (!Array.isArray(params.SellerSKUList)) {
+        throw new Error('params.SellerSKUList must be an array');
+      } else if (params.SellerSKUList.length > 50) {
+        throw new Error('params.SellerSKUList can have a maximum of 50 items.');
+      } else {
+        params.SellerSKUList.forEach((sku, i) => {
+          const counter = i + 1;
+          request.query[`SellerSKUList.Id.${counter}`] = sku;
+        });
+      }
+
+      if (typeof params.ShipToCountryCode !== 'string') {
+        throw new Error('params.ShipToCountryCode must be a string');
+      } else {
+        request.query.ShipToCountryCode = params.ShipToCountryCode;
+      }
+
+      /** Make the Call */
+      const { headers, body } = await this.makeCall(request, true);
+
+      /** Convert the XML to JSON */
+      const json = await InboundShipments.XMLToJSON(body);
+
+      if (json.$) {
+        delete json.$;
+      }
+
+      /** Return the parsed response */
+      return { headers, body: json };
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   static assignItems(request, items, itemType) {
