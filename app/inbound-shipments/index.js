@@ -68,7 +68,7 @@ class InboundShipments extends MWS {
 
       return { headers, body: json };
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
 
@@ -149,7 +149,7 @@ class InboundShipments extends MWS {
       /** Return the parsed response */
       return { headers, body: json };
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
 
@@ -260,7 +260,7 @@ class InboundShipments extends MWS {
       /** Return the parsed response */
       return { headers, body: json };
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
 
