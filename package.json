@@ -1,6 +1,6 @@
 {
   "name": "mws-sdk-async",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A simple class based approach to work with Amazon's Merchant Web Services APIs.",
   "main": "index.js",
   "repository": {
