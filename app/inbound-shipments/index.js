@@ -271,13 +271,18 @@ class InboundShipments extends MWS {
       _.keys(item).forEach((key) => {
         if (key !== 'PrepDetailsList') {
           request.query[`${itemType}.member.${itemNumber}.${key}`] = item[key];
+        } else if (Array.isArray(item[key].PrepInstruction)) {
+          item[key].PrepInstruction.forEach((instruction, index) => {
+            let instructNum = index + 1;
+            request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${instructNum}.PrepInstruction`] = instruction;
+            request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.${instructNum}.PrepOwner`] = item[key].PrepOwner;
+          });
         } else {
           request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.1.PrepInstruction`] = item[key].PrepInstruction;
           request.query[`${itemType}.member.${itemNumber}.PrepDetailsList.PrepDetails.1.PrepOwner`] = item[key].PrepOwner;
         }
       });
     });
-
     return request;
   }
 
