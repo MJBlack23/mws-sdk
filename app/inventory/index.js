@@ -4,7 +4,7 @@ class Inventory extends MWS {
   constructor(options) {
     super(options);
     this.BASE_REQUEST = {
-      method: 'GET',
+      method: 'POST',
       path: 'FulfillmentInventory',
       version: '2010-10-01',
       query: {},
@@ -21,6 +21,7 @@ class Inventory extends MWS {
   async listInventorySupply(params) {
     const request = { ...this.BASE_REQUEST };
     request.query.Action = 'ListInventorySupply';
+    request.form = true;
 
     /** Assign Seller ID */
     if (!params.SellerId) {
@@ -38,6 +39,8 @@ class Inventory extends MWS {
         throw new Error('Either SellerSkus or QueryDateStartTime must be supplied with this action.');
       } else if (params.SellerSkus && params.QueryStartDateTime) {
         throw new Error('Both SellerSkus and QueryDateStartTime cannot be present. One or the other for this action.');
+      } else if (params.SellerSkus.length > 50) {
+        throw new Error('Only 50 skus are allowed per call.');
       }
 
       if (params.SellerSkus) {
