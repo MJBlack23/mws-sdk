@@ -121,9 +121,7 @@ class Reports extends MWS {
     request.query.ReportId = reportId;
 
     const includeHeader = true;
-    let response = await this.makeCall(request, includeHeader);
-    /** Convert the XML to JSON */
-    // response = await Reports.XMLToJSON(response);
+    const response = await this.makeCall(request, includeHeader);
 
     return response;
   }
