@@ -80,7 +80,7 @@ class Reports extends MWS {
     return response;
   }
 
-  async getReportList (params) {
+  async getReportList(params) {
     const request = Object.assign({}, this.BASE_REQUEST);
     request.query.Action = 'GetReportList';
 

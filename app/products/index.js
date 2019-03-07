@@ -87,6 +87,41 @@ class Products extends MWS {
     // return response;
   }
 
+  async getMatchingProduct(asinList) {
+    if (!asinList || !Array.isArray(asinList)) {
+      throw Error('ASIN List must be an array');
+    }
+
+    if (asinList.length > 10) {
+      throw Error('A maximum of 10 ASINS are allowed per call');
+    }
+
+    const request = Object.assign({}, this.BASE_REQUEST);
+    request.query.Action = 'GetMatchingProduct';
+    request.query.MarketplaceId = this.marketplaceId;
+
+    Products.assignASINListToQuery(request, asinList);
+
+    const response = await this.makeCall(request);
+
+    return Products.XMLToJSON(response);
+  }
+
+  async listMatchingProducts(queryString) {
+    if (!queryString || typeof queryString !== 'string') {
+      throw Error('query string must be supplied with this call');
+    }
+
+    const request = Object.assign({}, this.BASE_REQUEST);
+    request.query.Action = 'ListMatchingProducts';
+    request.query.MarketplaceId = this.marketplaceId;
+    request.query.Query = queryString;
+
+    const response = await this.makeCall(request);
+
+    return Products.XMLToJSON(response);
+  }
+
 
   static validListLength(list, call) {
     if (list.length <= 0 || list.length > 20) {
@@ -98,6 +133,14 @@ class Products extends MWS {
   static assignSKUListToQuery(request, list) {
     list.forEach((item, i) => {
       request.query[`SellerSKUList.SellerSKU.${i + 1}`] = item;
+    });
+
+    return request;
+  }
+
+  static assignASINListToQuery(request, list) {
+    list.forEach((item, i) => {
+      request.query[`ASINList.ASIN.${i + 1}`] = item;
     });
 
     return request;

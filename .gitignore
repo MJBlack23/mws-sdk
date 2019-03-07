@@ -12,3 +12,12 @@ test/
 
 # docs
 out/
+
+#mws config
+config.js
+
+#test dev script
+test.js
+
+#test response
+response.js
