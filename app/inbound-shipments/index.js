@@ -264,6 +264,39 @@ class InboundShipments extends MWS {
     }
   }
 
+  async getInboundGuidanceForSKU(params) {
+    const request = { ...this.BASE_REQUEST };
+    request.query.Action = 'GetInboundGuidanceForSKU';
+    request.form = true;
+
+    /** Assign Seller ID */
+    if (!params.SellerId) {
+      request.query.SellerId = this.sellerId;
+    } else {
+      request.query.SellerId = params.SellerId;
+    }
+
+    try {
+      if (!Array.isArray(params.SellerSKUList)) {
+        throw new Error('params.SellerSKUList must be an array');
+      } else if (params.SellerSKUList.length > 50) {
+        throw new Error('params.SellerSKUList can have a maximum of 50 items');
+      } else {
+        InboundShipments.assignSkuList(request, params.SellerSKUList);
+      }
+
+      /** Make the Call */
+      const { headers, body } = await this.makeCall(request, true);
+
+      /** Convert the XML to JSON */
+      const json = await InboundShipments.XMLToJSON(body);
+
+      return { headers, body: json };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static assignItems(request, items, itemType) {
     let itemNumber;
     items.forEach((item, i) => {
@@ -295,6 +328,15 @@ class InboundShipments extends MWS {
           request.query[`ShipFromAddress.${key}`] = address[key];
         }
       }
+    });
+
+    return request;
+  }
+
+  static assignSkuList(request, skus) {
+    skus.forEach((sku, i) => {
+      const counter = i + 1;
+      request.query[`SellerSKUList.Id.${counter}`] = sku;
     });
 
     return request;
