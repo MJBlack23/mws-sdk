@@ -142,6 +142,26 @@ class Products extends MWS {
     return Products.XMLToJSON(response);
   }
 
+  async getMyPriceForASIN(asinList) {
+    if (!asinList || !Array.isArray(asinList)) {
+      throw Error('ASIN List must be an array');
+    }
+
+    if (asinList.length > 20) {
+      throw Error('A maximum of 20 ASINS are allowed per call');
+    }
+
+    const request = Object.assign({}, this.BASE_REQUEST);
+    request.query.Action = 'GetMyPriceForASIN';
+    request.query.MarketplaceId = this.marketplaceId;
+
+    Products.assignASINListToQuery(request, asinList);
+
+    const response = await this.makeCall(request);
+
+    return Products.XMLToJSON(response);
+  }
+
 
   static validListLength(list, call) {
     if (list.length <= 0 || list.length > 20) {
