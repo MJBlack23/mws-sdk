@@ -112,6 +112,26 @@ class Inventory extends MWS {
       throw e;
     }
   }
+
+  async getFulfillmentPreview(params) {
+    const request = { ...this.BASE_REQUEST };
+    request.query.Action = 'GetFulfillmentPreview';
+
+    /** Assign Seller ID */
+    if (!params.SellerId) {
+      request.query.SellerId = this.sellerId;
+    } else {
+      request.query.SellerId = params.SellerId;
+    }
+ 
+    try {
+      if (!params.Address || !params.Items) {
+        throw new Error('An Address and ')
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = Inventory;
