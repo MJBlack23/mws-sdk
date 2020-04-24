@@ -131,9 +131,40 @@ class Reports extends MWS {
   }
 
 
+  /**
+   * 
+   * @param {string} params.ReportType - The type of report being requested
+   * @param {string} params.Schedule - The scheduled type for the requested report. E.g.; _15_MINUTES, _30_MINUTES_, _1_DAY_
+   * @param {date} params.ScheduleDate - The date when the next report request is scheduled to be submitted (Optional)
+   */
+  async manageReportSchedule (params) {
+    const request = Object.assign({}, this.BASE_REQUEST);
+    request.query.Action = 'ManageReportSchedule';
 
-  async manageReportSchedule () {
-    return null; // not implemented
+    if (!params.ReportType || !params.Schedule) {
+      throw new Error('Parameters must include the Report Type and Schedule Enumeration');
+    }
+
+    try {
+      request.query.ReportType = params.ReportType;
+      request.query.Schedule = params.Schedule;
+
+      if (params.ScheduleDate) {
+        request.query.ScheduleDate = params.ScheduleDate;
+      }
+
+      const { headers, body } = await this.makeCall(request, true);
+
+      const json = await Reports.XMLToJSON(body);
+
+      if (json.$) {
+        delete json.$;
+      }
+
+      return { headers, body: json };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getReportScheduleList (nextToken=undefined) {
