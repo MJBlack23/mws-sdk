@@ -27,19 +27,8 @@ class Reports extends MWS {
       throw new Error(`${params.reportType} is not a supported report see ${REPORT_TYPE_URL} for more information.`);
     }
 
-    // Assign the params
-    const paramKeys = Object.keys(params);
-
-    /** Take each param and capitilize the first lettter then assign it to the query object. */
-    paramKeys.forEach((key) => {
-      if (key === 'startDate' || key === 'endDate') {
-        params[key] = moment.isMoment(params[key])
-          ? params[key].toISOString()
-          : moment(params[key]).toISOString();
-      }
-      const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-      request.query[formattedKey] = params[key];
-    });
+    /** Assign parameters to request object */
+    Reports.assignParams(request, params);
 
     let response = await this.makeCall(request);
     /** Convert the XML to JSON */
@@ -172,10 +161,22 @@ class Reports extends MWS {
     }
   }
 
-  static assignParams () {
-    
-  }
+  /** Take each param and capitilize the first lettter then assign it to the query object. */
+  static assignParams (request, params) {
+    const paramKeys = Object.keys(params);
 
+    paramKeys.forEach((key) => {
+      if (key === 'startDate' || key === 'endDate') {
+        params[key] = moment.isMoment(params[key])
+          ? params[key].toISOString()
+          : moment(params[key]).toISOString();
+      }
+      const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
+      request.query[formattedKey] = params[key];
+    });
+
+    return request;
+  }
 }
 
 module.exports = Reports;
