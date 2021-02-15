@@ -5,7 +5,7 @@ class Products extends MWS {
   constructor(options) {
     super(options);
     this.BASE_REQUEST = {
-      method: 'GET',
+      method: 'POST',
       path: 'Products',
       version: '2011-10-01',
       query: {},
@@ -62,29 +62,57 @@ class Products extends MWS {
 
 
   async getLowestPriceOffersForASIN(asin) {
-    if (typeof asin !== 'string' || asin.length !== 10) {
-      throw Error('This call requests a single 10 digit ASIN as a parameter.');
+    try {
+      if (typeof asin !== 'string' || asin.length !== 10) {
+        throw Error('This call requests a single 10 digit ASIN as a parameter.');
+      }
+  
+      const request = Object.assign({}, this.BASE_REQUEST);
+      request.query.Action = 'GetLowestPricedOffersForASIN';
+      request.query.ItemCondition = 'New';
+      request.query.ASIN = asin;
+      request.form = true;
+  
+      /** Make the Call */
+      const { headers, body } = await this.makeCall(request, true);
+
+      /** Convert the XML to JSON */
+      const json = await Products.XMLToJSON(body);
+
+      if (json.$) {
+        delete json.$;
+      }
+
+      /** Return the parsed response */
+      return { headers, body: json };
+    } catch (error) {
+      throw error;
     }
-
-    const request = Object.assign({}, this.BASE_REQUEST);
-    request.query.Action = 'GetLowestPricedOffersForASIN';
-    request.query.ItemCondition = 'New';
-    request.query.ASIN = asin;
-
-    return this.makeCall(request);
   }
 
 
   async getLowestPriceOffersForSKU(sku) {
-    const request = Object.assign({}, this.BASE_REQUEST);
-    request.query.Action = 'GetLowestPricedOffersForSKU';
-    request.query.ItemCondition = 'New';
-    request.query.SellerSKU = sku;
+    try {
+      const request = Object.assign({}, this.BASE_REQUEST);
+      request.query.Action = 'GetLowestPricedOffersForSKU';
+      request.query.ItemCondition = 'New';
+      request.query.SellerSKU = sku;
+  
+      /** Make the Call */
+      const { headers, body } = await this.makeCall(request, true);
 
-    const response = await this.makeCall(request);
+      /** Convert the XML to JSON */
+      const json = await Products.XMLToJSON(body);
 
-    return parsers.getLowestOffers(response);
-    // return response;
+      if (json.$) {
+        delete json.$;
+      }
+
+      /** Return the parsed response */
+      return { headers, body: json };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getMatchingProduct(asinList) {
